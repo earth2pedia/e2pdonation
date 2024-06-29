@@ -1,0 +1,36 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build the project
+        run: npm run build
+        env:
+          REACT_APP_INFURA_RPC_URL: ${{ secrets.INFURA_RPC_URL }}
+          REACT_APP_BICONOMY_API_KEY: ${{ secrets.BICONOMY_API_KEY }}
+          REACT_APP_CONTRACT_ADDRESS: ${{ secrets.CONTRACT_ADDRESS }}
+          REACT_APP_FORWARDER_ADDRESS: ${{ secrets.FORWARDER_ADDRESS }}
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build
